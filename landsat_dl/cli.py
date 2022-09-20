@@ -68,9 +68,9 @@ def cli():
     nargs=4,
     help="Bounding box (xmin, ymin, xmax, ymax).",
 )
-@click.option("-c", "--clouds", type=click.INT, help="Max. cloud cover (1-100).")
-@click.option("-s", "--start", type=click.STRING, help="Start date (YYYY-MM-DD).")
-@click.option("-e", "--end", type=click.STRING, help="End date (YYYY-MM-DD).")
+@click.option("-c", "--clouds", type=click.INT, help="Max. cloud cover (1-100)")
+@click.option("-s", "--start", type=click.STRING, help="Start date (YYYY-MM-DD)")
+@click.option("-e", "--end", type=click.STRING, help="End date (YYYY-MM-DD)")
 @click.option(
     "-o",
     "--output",
@@ -146,14 +146,14 @@ def scenes_from_csv(csv_file):
     "--username",
     "-u",
     type=click.STRING,
-    help="EarthExplorer username.",
+    help="EarthExplorer username",
     envvar="LANDSATXPLORE_USERNAME",
 )
 @click.option(
     "--password",
     "-p",
     type=click.STRING,
-    help="EarthExplorer password.",
+    help="EarthExplorer password",
     envvar="LANDSATXPLORE_PASSWORD",
 )
 @click.option("--dataset", "-d", type=click.STRING, required=False, help="Dataset")
@@ -162,17 +162,17 @@ def scenes_from_csv(csv_file):
     "-o",
     type=click.Path(exists=True, dir_okay=True),
     default=".",
-    help="Output directory.",
+    help="Output directory",
 )
 @click.option(
-    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds."
+    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds"
 )
 @click.option("--skip", is_flag=True, default=False)
 @click.argument(
     "scenes", type=click.STRING, nargs=-1, required=False
 )
 @click.option(
-    "--list", type=click.File('rb'), help="Identifier list to download"
+    "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
 )
 
 def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
@@ -206,17 +206,17 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
     "-o",
     type=click.Path(exists=True, dir_okay=True),
     default=".",
-    help="Output directory.",
+    help="Output directory",
 )
 @click.option(
-    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds."
+    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds"
 )
 @click.option("--skip", is_flag=True, default=False)
 @click.argument(
     "scenes", type=click.STRING, nargs=-1, required=False
 )
 @click.option(
-    "--list", type=click.File('rb'), help="Identifier list to download"
+    "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
 )
 def dl_google(dataset, output, timeout, skip, bands, scenes, list):
     """Download one or several scenes."""
