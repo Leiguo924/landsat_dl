@@ -56,7 +56,7 @@ setup(name='landsat_dl',
       download_url='https://github.com/{}/{}/archive/{}.tar.gz'.format('tristanblus', 'landsat_dl', tag),
       url='https://github.com/tristanblus',
       test_suite='tests.test_suite.suite',
-      install_requires=['requests', 'tqdm', 'click', 'shapely', 'python-dateutil', 'pretty_erros'],
+      install_requires=['requests', 'tqdm', 'click', 'shapely', 'python-dateutil', 'pretty_errors'],
       **setup_kwargs)
 
 
