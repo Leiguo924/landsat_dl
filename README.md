@@ -2,7 +2,7 @@
 
 Landsat images download from USGS or Google Cloud Storage.
 
-This tool were modified based the work of *landsatxplore* (https://github.com/yannforget/landsatxplore)
+This tool were modified based on the work of ***landsatxplore*** (https://github.com/yannforget/landsatxplore)
 
 ## Why repeat the wheel?
 * *landsatxplore* has been outdated a while, there are a few critial issue：<br>
@@ -14,7 +14,7 @@ This tool were modified based the work of *landsatxplore* (https://github.com/ya
 * However, it's incomplete with large gaps, and of course is out of date.
 
 ## What's different?
-* Seach image list through the USGS web api
+* Seach image list through the USGS web API
 * Allow individual band downloading from Google<br>
 
 ***Yes, I want them both.***
@@ -100,3 +100,8 @@ Options:
   * Then, use the results list as identifiers to download data from Google, only band 'B8' is specified
   
   `landsat_dl dl-google --list tmp.csv -b 8 -o ./test`
+
+  ## To do
+  * unify the module(function) name to *landsat_dl* (or some better name)
+  * USGS download error handling, maybe wait for the update of *landsatxplore*?
+  * paraller downloading using aria?
