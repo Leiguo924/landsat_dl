@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "landsatxplore"
+version = "0.13.0"
+description = "Search and download Landsat scenes from EarthExplorer"
+authors = ["Yann Forget <yannforget@mailbox.org>"]
+maintainers = ["Yann Forget <yannforget@mailbox.org>"]
+license = "MIT"
+readme = "README.md"
+homepage = "https://github.com/yannforget/landsat_dl"
+repository = "https://github.com/yannforget/landsat_dl"
+documentation = "https://github.com/yannforget/landsat_dl"
+keywords = [
+    "earth observation",
+    "remote sesing",
+    "GIS",
+    "satellite imagery",
+    "landsat",
+    "sentinel",
+    "usgs"
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.20"
+tqdm = "^4.58"
+click = "^7.1"
+shapely = "^1.7"
+python-dateutil = "^2.8"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+pytest-cov = "^2.11"
+
+[tool.poetry.urls]
+issues = "https://github.com/yannforget/landsat_dl/issues"
+
+[tool.poetry.scripts]
+landsat_dl = "landsat_dl.cli:cli"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.black]
+line-length = 88
