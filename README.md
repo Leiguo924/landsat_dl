@@ -17,4 +17,22 @@ This tool were modified based the work of *landsatxplore* (https://github.com/ya
 * Seach image list through the USGS web api
 * Allow individual band downloading from Google<br>
 
-***I want them both.***
+***Yes, I want them both.***
+
+## How to install?
+  - `cd /usr/local`  
+  - `git clone https://github.com/TristanBlus/landsat_dl.git`  
+  - `cd landsat_dl`<br>
+  
+  install this package in the editable mode with option `-e`  
+  - `pip install -e .`<br>
+  
+  finally, set the parameters of USGS account in the env_path file `~/.bashrc`
+  
+  
+  `export LANDSATXPLORE_USERNAME=TristanBlus`
+  
+  `export LANDSATXPLORE_PASSWORD=W0gieVy3f8A6`
+  
+ ## Usage
+  ```
