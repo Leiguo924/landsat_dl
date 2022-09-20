@@ -218,7 +218,7 @@ class EarthExplorer(object):
 
 class Google_download(object):
     
-    def download(self, identifier, output_dir, dataset=None, bands='all', timeout=300, skip=False):
+    def download(self, identifier, output_dir, dataset, bands, timeout=300, skip=False):
 
         
         if not dataset:
@@ -237,7 +237,7 @@ class Google_download(object):
         )
         
         img = root_url.split("/")[-1]
-        if bands == 'all':
+        if bands[0] is 'all':
             bands = util.band_map(dataset)
         else:
             bands = util.band_check(dataset, bands)

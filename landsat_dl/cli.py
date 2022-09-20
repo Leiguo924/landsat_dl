@@ -200,7 +200,9 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
 
 @click.command()
 @click.option("--dataset", "-d", type=click.STRING, required=False, help="Dataset")
-@click.option("--bands", "-b", type=click.STRING, required=False, multiple=True, help="Band")
+@click.option(
+    "--bands", "-b", type=click.STRING, required=False, default=["all"], multiple=True, help="Band"
+)
 @click.option(
     "--output",
     "-o",
