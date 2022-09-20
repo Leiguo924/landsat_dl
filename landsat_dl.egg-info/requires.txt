@@ -1,0 +1,6 @@
+requests
+tqdm
+click
+shapely
+python-dateutil
+pretty_errors

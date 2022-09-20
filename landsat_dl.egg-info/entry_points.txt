@@ -1,0 +1,2 @@
+[console_scripts]
+landsat_dl = landsat_dl.cli:cli
