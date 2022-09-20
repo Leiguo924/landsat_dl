@@ -49,14 +49,14 @@ setup(name='landsat_dl',
           'Programming Language :: Python :: 2.7',
           'Programming Language :: Python :: 3.6'],
       keywords='landsat download hydrology remote sensing',
-      author='David Ketchum',
-      author_email='dgketchum@gmail.com',
+      author='Lei Guo',
+      author_email='tristanblus@csu.edu.cn',
       platforms='Posix; MacOS X; Windows',
       packages=['landsat_dl'],
-      download_url='https://github.com/{}/{}/archive/{}.tar.gz'.format('dgketchum', 'Landsat578', tag),
+      download_url='https://github.com/{}/{}/archive/{}.tar.gz'.format('tristanblus', 'landsat_dl', tag),
       url='https://github.com/tristanblus',
       test_suite='tests.test_suite.suite',
-      install_requires=['requests', 'tqdm', 'click', 'shapely', 'python-dateutil'],
+      install_requires=['requests', 'tqdm', 'click', 'shapely', 'python-dateutil', 'pretty_erros'],
       **setup_kwargs)
 
 
