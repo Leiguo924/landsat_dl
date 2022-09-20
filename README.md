@@ -97,6 +97,6 @@ Options:
   
   `landsat_dl search -d landsat_8_c1 -l 38.9 72.3 -s 2018-07-15 -e 2018-09-15 -o csv`
   
-  * Then, use the results list as identifiers to download data from Google
+  * Then, use the results list as identifiers to download data from Google, only band 'B8' is specified
   
-  `landsat_dl dl-google --list tmp.csv -o ./test`
+  `landsat_dl dl-google --list tmp.csv -b 8 -o ./test`
