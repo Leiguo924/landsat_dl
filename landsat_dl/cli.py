@@ -6,6 +6,7 @@ import csv
 from io import StringIO
 
 import click
+import pretty_errors
 
 from landsat_dl.api import API
 from landsat_dl.earthexplorer import EarthExplorer
@@ -123,7 +124,22 @@ def search(
             w.writeheader()
             w.writerows(results)
             click.echo(f.getvalue())
+            
+        with open("tmp.csv", 'a', newline='') as f:
+            w = csv.DictWriter(f, results[0].keys())
+            w.writeheader()
+            for scene in results:
+                w.writerow(scene)
 
+def scenes_from_csv(csv_file):
+    try:
+        with open(csv_file) as f:
+            reader = csv.DictReader(f)
+            scenes = [row['display_id'] for row in reader]
+            return scenes
+    except:
+        print("The input csv list should be generated using the serach module first!") 
+        exit()  
 
 @click.command()
 @click.option(
@@ -152,13 +168,26 @@ def search(
     "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds."
 )
 @click.option("--skip", is_flag=True, default=False)
-@click.argument("scenes", type=click.STRING, nargs=-1)
-def dl_usgs(username, password, dataset, output, timeout, skip, scenes):
+@click.argument(
+    "scenes", type=click.STRING, nargs=-1, required=False
+)
+@click.option(
+    "--list", type=click.File('rb'), help="Identifier list to download"
+)
+
+def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
     """Download one or several scenes."""
     ee = EarthExplorer(username, password)
     output_dir = os.path.abspath(output)
+    
     if dataset and dataset not in DATASETS:
         raise LandsatxploreError(f"`{dataset}` is not a supported dataset.")
+    
+    if list is not None:
+        scenes = scenes_from_csv(list.name)
+    elif scenes is None:
+        raise LandsatxploreError(f"At leatst one of the Scenes ID or list should be specified.")
+
     for scene in scenes:
         if not ee.logged_in():
             ee = EarthExplorer(username, password)
@@ -170,22 +199,8 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes):
     ee.logout()
 
 @click.command()
-@click.option(
-    "--username",
-    "-u",
-    type=click.STRING,
-    help="EarthExplorer username.",
-    envvar="LANDSATXPLORE_USERNAME",
-)
-@click.option(
-    "--password",
-    "-p",
-    type=click.STRING,
-    help="EarthExplorer password.",
-    envvar="LANDSATXPLORE_PASSWORD",
-)
 @click.option("--dataset", "-d", type=click.STRING, required=False, help="Dataset")
-@click.option("--band", "-b", type=click.STRING, required=False, help="Band")
+@click.option("--bands", "-b", type=click.STRING, required=False, multiple=True, help="Band")
 @click.option(
     "--output",
     "-o",
@@ -197,22 +212,31 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes):
     "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds."
 )
 @click.option("--skip", is_flag=True, default=False)
-@click.argument("scenes", type=click.STRING, nargs=-1)
-def dl_google(username, password, dataset, output, timeout, skip, scenes):
+@click.argument(
+    "scenes", type=click.STRING, nargs=-1, required=False
+)
+@click.option(
+    "--list", type=click.File('rb'), help="Identifier list to download"
+)
+def dl_google(dataset, output, timeout, skip, bands, scenes, list):
     """Download one or several scenes."""
-    ee = EarthExplorer(username, password)
+    ee = Google_download()
     output_dir = os.path.abspath(output)
+    
     if dataset and dataset not in DATASETS:
         raise LandsatxploreError(f"`{dataset}` is not a supported dataset.")
+    
+    if list is not None:
+        scenes = scenes_from_csv(list.name)
+    elif scenes is None:
+        raise LandsatxploreError(f"At leatst one of the Scenes ID or list should be specified.")
+    
     for scene in scenes:
-        if not ee.logged_in():
-            ee = EarthExplorer(username, password)
-        fname = ee.dl_google(
-            scene, output_dir, dataset=dataset, timeout=timeout, skip=skip
+        fname = ee.download(
+            scene, output_dir, dataset=dataset, bands=bands, timeout=timeout, skip=skip
         )
         if skip:
             click.echo(fname)
-    ee.logout()
 
 
 

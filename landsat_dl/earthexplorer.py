@@ -7,8 +7,8 @@ import requests
 from tqdm import tqdm
 
 from landsat_dl.api import API
-from landsat_dl.errors import EarthExplorerError
-from landsat_dl.util import guess_dataset, is_display_id
+from landsat_dl.errors import EarthExplorerError, LandsatxploreError
+import landsat_dl.util as util
 
 
 EE_URL = "https://earthexplorer.usgs.gov/"
@@ -18,7 +18,7 @@ EE_DOWNLOAD_URL = (
     "https://earthexplorer.usgs.gov/download/{data_product_id}/{entity_id}/EE/"
 )
 GG_DOWNLOAD_URL = (
-    "https://earthexplorer.usgs.gov/download/{data_product_id}/01/{entity_id}/EE/"
+    "http://storage.googleapis.com/gcp-public-data-landsat/{data_product_id}/01/{path}/{row}/{display_id}"
 )
 
 # IDs of GeoTIFF data product for each dataset
@@ -45,14 +45,66 @@ DATA_PRODUCTS_GG = {
 def _get_tokens(body):
     """Get `csrf_token` and `__ncforminfo`."""
     csrf = re.findall(r'name="csrf" value="(.+?)"', body)[0]
-    ncform = re.findall(r'name="__ncforminfo" value="(.+?)"', body)[0]
+    # ncform = re.findall(r'name="__ncforminfo" value="(.+?)"', body)[0]
 
     if not csrf:
         raise EarthExplorerError("EE: login failed (csrf token not found).")
-    if not ncform:
-        raise EarthExplorerError("EE: login failed (ncforminfo not found).")
+    # if not ncform:
+    #     raise EarthExplorerError("EE: login failed (ncforminfo not found).")
 
-    return csrf, ncform
+    return csrf #, ncform
+
+def fetch_image(url, output_dir, timeout, chunk_size=1024, skip=False):
+    """Download remote file given its URL."""
+    # Check availability of the requested product
+    # EarthExplorer should respond with JSON
+    session = requests.Session()
+    with session.get(url, allow_redirects=False, stream=True, timeout=timeout
+    ) as r:
+        r.raise_for_status()
+        if "google" not in url:
+            error_msg = r.json().get("errorMessage")
+            if error_msg:
+                raise EarthExplorerError(error_msg)
+            download_url = r.json().get("url")
+        else:
+            download_url = url
+
+    try:
+        with session.get(
+            download_url, stream=True, allow_redirects=True, timeout=timeout
+        ) as r:
+            file_size = int(r.headers.get("Content-Length"))
+            
+            if "google" not in url:
+                local_filename = r.headers["Content-Disposition"].split("=")[-1]
+                local_filename = local_filename.replace('"', "")
+            else:
+                local_filename = download_url.split("/")[-1]                    
+            
+            local_filename = os.path.join(output_dir, local_filename)
+            print(os.path.basename(local_filename))
+            
+            if os.path.exists(local_filename):
+                if os.path.getsize(local_filename) == file_size:
+                    skip = True                
+            if skip:
+                print('File already exist.')
+                return local_filename
+            else:
+                with tqdm(
+                    total=file_size, unit_scale=True, unit="B", unit_divisor=1024,
+                     ) as pbar:
+                    with open(local_filename, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=chunk_size):
+                            if chunk:
+                                f.write(chunk)
+                                pbar.update(chunk_size)
+    except requests.exceptions.Timeout:
+        raise EarthExplorerError(
+            "Connection timeout after {} seconds.".format(timeout)
+        )
+    return local_filename
 
 
 class EarthExplorer(object):
@@ -72,12 +124,13 @@ class EarthExplorer(object):
     def login(self, username, password):
         """Login to Earth Explorer."""
         rsp = self.session.get(EE_LOGIN_URL)
-        csrf, ncform = _get_tokens(rsp.text)
+        # csrf, ncform = _get_tokens(rsp.text)
+        csrf = _get_tokens(rsp.text)
         payload = {
             "username": username,
             "password": password,
             "csrf": csrf,
-            "__ncforminfo": ncform,
+            # "__ncforminfo": ncform,
         }
         rsp = self.session.post(EE_LOGIN_URL, data=payload, allow_redirects=True)
 
@@ -88,42 +141,42 @@ class EarthExplorer(object):
         """Log out from Earth Explorer."""
         self.session.get(EE_LOGOUT_URL)
 
-    def _download(self, url, output_dir, timeout, chunk_size=1024, skip=False):
-        """Download remote file given its URL."""
-        # Check availability of the requested product
-        # EarthExplorer should respond with JSON
-        with self.session.get(
-            url, allow_redirects=False, stream=True, timeout=timeout
-        ) as r:
-            r.raise_for_status()
-            error_msg = r.json().get("errorMessage")
-            if error_msg:
-                raise EarthExplorerError(error_msg)
-            download_url = r.json().get("url")
+    # def _download(self, url, output_dir, timeout, chunk_size=1024, skip=False):
+    #     """Download remote file given its URL."""
+    #     # Check availability of the requested product
+    #     # EarthExplorer should respond with JSON
+    #     with self.session.get(
+    #         url, allow_redirects=False, stream=True, timeout=timeout
+    #     ) as r:
+    #         r.raise_for_status()
+    #         error_msg = r.json().get("errorMessage")
+    #         if error_msg:
+    #             raise EarthExplorerError(error_msg)
+    #         download_url = r.json().get("url")
 
-        try:
-            with self.session.get(
-                download_url, stream=True, allow_redirects=True, timeout=timeout
-            ) as r:
-                file_size = int(r.headers.get("Content-Length"))
-                with tqdm(
-                    total=file_size, unit_scale=True, unit="B", unit_divisor=1024
-                ) as pbar:
-                    local_filename = r.headers["Content-Disposition"].split("=")[-1]
-                    local_filename = local_filename.replace('"', "")
-                    local_filename = os.path.join(output_dir, local_filename)
-                    if skip:
-                        return local_filename
-                    with open(local_filename, "wb") as f:
-                        for chunk in r.iter_content(chunk_size=chunk_size):
-                            if chunk:
-                                f.write(chunk)
-                                pbar.update(chunk_size)
-        except requests.exceptions.Timeout:
-            raise EarthExplorerError(
-                "Connection timeout after {} seconds.".format(timeout)
-            )
-        return local_filename
+    #     try:
+    #         with self.session.get(
+    #             download_url, stream=True, allow_redirects=True, timeout=timeout
+    #         ) as r:
+    #             file_size = int(r.headers.get("Content-Length"))
+    #             with tqdm(
+    #                 total=file_size, unit_scale=True, unit="B", unit_divisor=1024
+    #             ) as pbar:
+    #                 local_filename = r.headers["Content-Disposition"].split("=")[-1]
+    #                 local_filename = local_filename.replace('"', "")
+    #                 local_filename = os.path.join(output_dir, local_filename)
+    #                 if skip:
+    #                     return local_filename
+    #                 with open(local_filename, "wb") as f:
+    #                     for chunk in r.iter_content(chunk_size=chunk_size):
+    #                         if chunk:
+    #                             f.write(chunk)
+    #                             pbar.update(chunk_size)
+    #     except requests.exceptions.Timeout:
+    #         raise EarthExplorerError(
+    #             "Connection timeout after {} seconds.".format(timeout)
+    #         )
+    #     return local_filename
 
     def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False):
         """Download a Landsat scene.
@@ -146,67 +199,53 @@ class EarthExplorer(object):
         filename : str
             Path to downloaded file.
         """
-        os.makedirs(output_dir, exist_ok=True)
+        
         if not dataset:
-            dataset = guess_dataset(identifier)
-        if is_display_id(identifier):
+            dataset, path, row = util.guess_dataset(identifier)
+        
+        output_dir = os.path.join(output_dir, path+row)
+        os.makedirs(output_dir, exist_ok=True)
+        
+        if util.is_display_id(identifier):
             entity_id = self.api.get_entity_id(identifier, dataset)
         else:
             entity_id = identifier
         url = GG_DOWNLOAD_URL.format(
-            data_product_id=DATA_PRODUCTS_GG[dataset], entity_id=entity_id
+            data_product_id=DATA_PRODUCTS[dataset], entity_id=entity_id
         )
-        filename = self._download(url, output_dir, timeout=timeout, skip=skip)
+        filename = fetch_image(url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
         return filename
 
 class Google_download(object):
-    def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False):
+    
+    def download(self, identifier, output_dir, dataset=None, bands='all', timeout=300, skip=False):
 
-        os.makedirs(output_dir, exist_ok=True)
+        
         if not dataset:
-            dataset = guess_dataset(identifier)
-        if is_display_id(identifier):
-            entity_id = self.api.get_entity_id(identifier, dataset)
+            dataset,path,row = util.guess_dataset(identifier)
+        
+        output_dir = os.path.join(output_dir, path+row)
+        os.makedirs(output_dir, exist_ok=True)
+        
+        if util.is_entity_id(identifier):
+            raise LandsatxploreError("ERROR: Display ID should be input for google download!")
         else:
-            entity_id = identifier
-        url = EE_DOWNLOAD_URL.format(
-            data_product_id=DATA_PRODUCTS[dataset], entity_id=entity_id
-        )
-        filename = self._download(url, output_dir, timeout=timeout, skip=skip)
-        return filename
-
-    
-    
-    def _make_url(row, band):
-        try:
-            from urllib.parse import urlparse, urlunparse
-        except ImportError:
-            from urlparse import urlparse, urlunparse
+            display_id = identifier
             
-        parse = urlparse('http://storage.googleapis.com/gcp-public-data-landsat/LC08/01/037/029/'
-                         'LC08_L1TP_037029_20130602_20170310_01_T1/LC08_L1TP_037029_20130602_20170310_01_T1_B2.TIF')
-
-        base = row.BASE_URL.replace('gs://', '')
-        path = '{}/{}_{}'.format(base, row.PRODUCT_ID, band)
-        url = urlunparse([parse.scheme, parse.netloc, path, '', '', ''])
-        return url
-    
-    def _fetch_image(url, destination_path=None):
-
-        if not destination_path:
-            destination_path = os.path.join(os.getcwd(), os.path.basename(url))
-
-        try:
-            response = get(url, stream=True)
-            if response.status_code == 200:
-                with open(destination_path, 'wb') as f:
-                    print('Getting {}'.format(os.path.basename(url)))
-                    for chunk in response.iter_content(chunk_size=1024 * 1024 * 8):
-                        f.write(chunk)
-
-            elif response.status_code > 399:
-                print('Code {} on {}'.format(response.status_code, url))
-                raise BadRequestsResponse(Exception)
-        except BadRequestsResponse:
-            pass
-    
+        root_url = GG_DOWNLOAD_URL.format(
+            data_product_id=DATA_PRODUCTS_GG[dataset], path=path, row=row, display_id=display_id
+        )
+        
+        img = root_url.split("/")[-1]
+        if bands == 'all':
+            bands = util.band_map(dataset)
+        else:
+            bands = util.band_check(dataset, bands)
+        
+        filename=[]
+        for band in bands:
+            complete_url = root_url + "/" + img + "_" + band
+            dst_file = fetch_image(complete_url, output_dir, timeout, chunk_size=1024, skip=False)
+            filename.append(dst_file)
+                        
+        return filename

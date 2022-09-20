@@ -1,5 +1,5 @@
 """Utility functions."""
-
+import re
 from landsat_dl.errors import LandsatxploreError
 
 
@@ -53,7 +53,8 @@ def parse_product_id(product_id):
         "sensor": elements[0][1],
         "satellite": elements[0][2:4],
         "processing_level": elements[1],
-        "satellite_orbits": elements[2],
+        "path": elements[2][0:3],
+        "row": elements[2][3:6],
         "acquisition_date": elements[3],
         "processing_date": elements[4],
         "collection_number": elements[5],
@@ -113,11 +114,11 @@ def guess_dataset(identifier):
         satellite = int(meta["satellite"])
         collection = "c" + meta["collection_number"][-1]
         level = meta["processing_level"][:2].lower()
-        return landsat_dataset(satellite, collection, level)
+        return landsat_dataset(satellite, collection, level), meta["path"], meta["row"]
     elif _is_landsat_scene_id(identifier):
         meta = parse_scene_id(identifier)
         satellite = int(meta["satellite"])
-        return landsat_dataset(satellite)
+        return landsat_dataset(satellite), meta["path"], meta["row"]
     elif _is_sentinel_display_id(identifier) or _is_sentinel_entity_id(identifier):
         return "sentinel_2a"
     else:
@@ -139,3 +140,34 @@ def camel_to_snake(src_string):
         else:
             dst_string.append(c)
     return "".join(dst_string)
+
+def band_map(dataset):
+    if "landsat_tm" in dataset :
+        bands = ['B1.TIF', 'B2.TIF', 'B3.TIF', 'B4.TIF', 'B5.TIF',
+                          'B6.TIF', 'B7.TIF', 'GCP.txt', 'VER.txt', 'VER.jpg',
+                          'ANG.txt', 'BQA.TIF', 'MTL.txt']
+    elif "landsat_8" in dataset :
+        bands = ['B1.TIF', 'B2.TIF', 'B3.TIF', 'B4.TIF', 'B5.TIF',
+                          'B6.TIF', 'B7.TIF', 'B8.TIF', 'B9.TIF', 'B10.TIF',
+                          "B11.TIF", 'ANG.txt', 'BQA.TIF', 'MTL.txt']
+    elif "landsat_etm" in dataset :
+        bands = ['B1.TIF', 'B2.TIF', 'B3.TIF', 'B4.TIF', 'B5.TIF',
+                          'B6_VCID_1.TIF', 'B6_VCID_2.TIF', 'B7.TIF',
+                          'B8.TIF', 'ANG.txt', 'BQA.TIF', 'MTL.txt']
+    else:
+        bands = ['B1.TIF', 'B2.TIF', 'B3.TIF', 'B4.TIF', 'B5.TIF',
+                          'B6.TIF', 'B6_VCID_1.TIF', 'B6_VCID_2.TIF', 'B7.TIF',
+                          'B8.TIF', 'B9.TIF', 'ANG.txt', 'BQA.TIF', 'MTL.txt']
+    return bands
+
+def band_check(dataset, bands_in):
+    all_bands = band_map(dataset)
+    band_orig = []
+    for band_in in bands_in:
+        for band in all_bands:
+            if re.findall(r'\d', band_in) == re.findall(r'\d', band):
+                band_orig.append(all_bands[all_bands.index(band)])
+    if len(band_orig) == 0:
+        raise LandsatxploreError("Wrong input of band name.")
+    else:
+        return band_orig                 
