@@ -30,9 +30,9 @@ This tool were modified based on the work of ***landsatxplore*** (https://github
   finally, set the parameters of USGS account in the env_path file `~/.bashrc`
   
   
-  `export LANDSATXPLORE_USERNAME=TristanBlus`
+  `export LANDSATXPLORE_USERNAME=Username`
   
-  `export LANDSATXPLORE_PASSWORD=W0gieVy3f8A6`
+  `export LANDSATXPLORE_PASSWORD=Password`
   
  ## Usage
   ```
