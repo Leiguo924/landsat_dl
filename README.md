@@ -47,8 +47,6 @@ This tool were modified based on the work of ***landsatxplore*** (https://github
   ```
   Usage: landsat_dl search [OPTIONS]
 
-  Search for scenes.
-
 Options:
   -u, --username TEXT             EarthExplorer username.
   -p, --password TEXT             EarthExplorer password.
