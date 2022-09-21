@@ -100,6 +100,6 @@ Options:
   `landsat_dl dl-google --list tmp.csv -b 8 -o ./test`
 
   ## To do
-  * unify the module(function) name to *landsat_dl* (or some better name)
+  * unify the module(function) name to *landsat_dl* (or other better name)
   * USGS download error handling, maybe wait for the update of *landsatxplore*?
-  * paraller downloading using aria?
+  * parallel downloading with Aria2?
