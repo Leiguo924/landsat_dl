@@ -212,7 +212,7 @@ class API(object):
         start_date=None,
         end_date=None,
         months=None,
-        max_results=100,
+        max_results=300,
     ):
         """Search for scenes.
 
