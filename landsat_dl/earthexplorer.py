@@ -239,6 +239,8 @@ class Google_download(object):
         img = root_url.split("/")[-1]
         if bands[0] == 'all':
             bands = util.band_map(dataset)
+        elif bands[0] == 'single':
+            bands = util.default_single_band(dataset)
         else:
             bands = util.band_check(dataset, bands)
         

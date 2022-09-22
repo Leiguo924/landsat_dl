@@ -170,4 +170,15 @@ def band_check(dataset, bands_in):
     if len(band_orig) == 0:
         raise LandsatxploreError("Wrong input of band name.")
     else:
-        return band_orig                 
+        return band_orig  
+
+def default_single_band(dataset):
+    if "landsat_tm" in dataset :
+        bands = ['B4.TIF']
+    elif "landsat_8" in dataset :
+        bands = ['B8.TIF']
+    elif "landsat_etm" in dataset :
+        bands = ['B8.TIF']
+    else:
+        bands = ['B8.TIF']
+    return bands                
