@@ -210,7 +210,7 @@ class EarthExplorer(object):
             entity_id = self.api.get_entity_id(identifier, dataset)
         else:
             entity_id = identifier
-        url = GG_DOWNLOAD_URL.format(
+        url = EE_DOWNLOAD_URL.format(
             data_product_id=DATA_PRODUCTS[dataset], entity_id=entity_id
         )
         filename = fetch_image(url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
@@ -237,7 +237,7 @@ class Google_download(object):
         )
         
         img = root_url.split("/")[-1]
-        if bands[0] is 'all':
+        if bands[0] == 'all':
             bands = util.band_map(dataset)
         else:
             bands = util.band_check(dataset, bands)
