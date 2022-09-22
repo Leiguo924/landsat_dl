@@ -37,8 +37,8 @@ DATA_PRODUCTS = {
 
 DATA_PRODUCTS_GG = {
     "landsat_8_c1": "LC08",
-    "landsat_tm_c2_l1": "LT05",
-    "landsat_etm_c2_l1": "LE07",
+    "landsat_tm_c1": "LT05",
+    "landsat_etm_c1": "LE07",
 }
 
 
