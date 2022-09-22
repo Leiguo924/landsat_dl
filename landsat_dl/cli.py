@@ -119,17 +119,24 @@ def search(
         click.echo(dump)
 
     if output == "csv":
-        with StringIO("tmp.csv") as f:
-            w = csv.DictWriter(f, results[0].keys())
-            w.writeheader()
-            w.writerows(results)
-            click.echo(f.getvalue())
-            
-        with open("tmp.csv", 'a', newline='') as f:
+        # with StringIO("tmp.csv") as f:
+        #     w = csv.DictWriter(f, results[0].keys())
+        #     w.writeheader()
+        #     w.writerows(results)
+        #     click.echo(f.getvalue())
+        
+        path = [scene["wrs_path"] for scene in results]
+        row = [scene["wrs_row"] for scene in results]
+        if len(set(path)) == 1 & len(set(row)) == 1:
+            csv_file = dataset + '_P'+ str(path[0]).zfill(3) + '_R' + str(row[0]).zfill(3) + '.csv'
+        else:    
+            csv_file = dataset + '_N'+ str(round(float(latitude), 1)) + '_E' + str(round(float(longitude), 1)) + '.csv'
+        with open(csv_file, 'w+', newline='') as f:
             w = csv.DictWriter(f, results[0].keys())
             w.writeheader()
             for scene in results:
                 w.writerow(scene)
+        print("Output serch results: %s" % csv_file)
 
 def scenes_from_csv(csv_file):
     try:
