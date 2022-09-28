@@ -77,14 +77,14 @@ class API(object):
             If the USGS API returns a non-null error code.
         """
         url = urljoin(self.url, endpoint)
-        data = json.dumps(params)
-        r = self.session.get(url, data=data)
+        data = json.dumps(params)        
         try:
+            r = self.session.get(url, data=data)
             self.raise_api_error(r)
         except USGSRateLimitError:
-            time.sleep(3)
+            time.sleep(1)
             r = self.session.get(url, data=data)
-        self.raise_api_error(r)
+            self.raise_api_error(r)
         return r.json().get("data")
 
     def login(self, username, password):
