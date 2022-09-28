@@ -182,7 +182,7 @@ def scenes_from_csv(csv_file):
     "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
 )
 @click.option(
-    "--landsatlook", is_flag=True, help="If only download the Landsatlook image"
+    "--landsatlook", is_flag=True, help="Flag for downloading Landsatlook image"
 )
 
 def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list, landsatlook):
