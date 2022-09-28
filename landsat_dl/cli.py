@@ -181,8 +181,11 @@ def scenes_from_csv(csv_file):
 @click.option(
     "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
 )
+@click.option(
+    "--landsatlook", is_flag=True, help="If only download the Landsatlook image"
+)
 
-def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
+def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list, landsatlook):
     """Download one or several scenes."""
     ee = EarthExplorer(username, password)
     output_dir = os.path.abspath(output)
@@ -199,7 +202,7 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list):
         if not ee.logged_in():
             ee = EarthExplorer(username, password)
         fname = ee.download(
-            scene, output_dir, dataset=dataset, timeout=timeout, skip=skip
+            scene, output_dir, dataset=dataset, timeout=timeout, skip=skip, landsatlook=landsatlook
         )
         if skip:
             click.echo(fname)
