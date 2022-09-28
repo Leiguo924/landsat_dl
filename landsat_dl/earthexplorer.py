@@ -115,24 +115,26 @@ class EarthExplorer(object):
                     break
                 
             file_size = int(r.headers.get("Content-Length"))
-            with tqdm(
+            
+            local_filename = r.headers["Content-Disposition"].split("=")[-1]
+            local_filename = local_filename.replace('"', "")
+            local_filename = os.path.join(output_dir, local_filename)
+            print(os.path.basename(local_filename))
+            if os.path.exists(local_filename):
+                if os.path.getsize(local_filename) == file_size:
+                    skip = True                
+            if skip:
+                print('File already exist.')
+                return local_filename
+            else:
+                with tqdm(
                 total=file_size, unit_scale=True, unit="B", unit_divisor=1024
             ) as pbar:
-                local_filename = r.headers["Content-Disposition"].split("=")[-1]
-                local_filename = local_filename.replace('"', "")
-                local_filename = os.path.join(output_dir, local_filename)
-                print(os.path.basename(local_filename))
-                if os.path.exists(local_filename):
-                    if os.path.getsize(local_filename) == file_size:
-                        skip = True                
-                if skip:
-                    print('File already exist.')
-                    return local_filename
-                with open(local_filename, "wb") as f:
-                    for chunk in r.iter_content(chunk_size=chunk_size):
-                        if chunk:
-                            f.write(chunk)
-                            pbar.update(chunk_size)
+                    with open(local_filename, "wb") as f:
+                        for chunk in r.iter_content(chunk_size=chunk_size):
+                            if chunk:
+                                f.write(chunk)
+                                pbar.update(chunk_size)
         except requests.exceptions.Timeout:
             raise EarthExplorerError(
                 "Connection timeout after {} seconds.".format(timeout)
