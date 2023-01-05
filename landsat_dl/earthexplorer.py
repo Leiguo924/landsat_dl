@@ -23,18 +23,18 @@ GG_DOWNLOAD_URL = (
 )
 
 # IDs of GeoTIFF data product for each dataset
-DATA_PRODUCTS = {
-    "landsat_tm_c1": "5e83d08fd9932768",
-    "landsat_etm_c1": "5e83a507d6aaa3db",
-    "landsat_8_c1": "5e83d0b84df8d8c2",
-    "landsat_tm_c2_l1": "5e83d0a0f94d7d8d",
-    "landsat_etm_c2_l1": "5e83d0d08fec8a66",
-    "landsat_ot_c2_l1": "5e81f14f92acf9ef",
-    "landsat_tm_c2_l2": "5e83d11933473426",
-    "landsat_etm_c2_l2": "5e83d12aed0efa58",
-    "landsat_ot_c2_l2": "5e83d14fec7cae84",
-    "sentinel_2a": "5e83a42c6eba8084",
-}
+# DATA_PRODUCTS = {
+#     "landsat_tm_c1": "5e83d08fd9932768",
+#     "landsat_etm_c1": "5e83a507d6aaa3db",
+#     "landsat_8_c1": "5e83d0b84df8d8c2",
+#     "landsat_tm_c2_l1": "5e83d0a0f94d7d8d",
+#     "landsat_etm_c2_l1": "5e83d0d08fec8a66",
+#     "landsat_ot_c2_l1": "5e81f14f92acf9ef",
+#     "landsat_tm_c2_l2": "5e83d11933473426",
+#     "landsat_etm_c2_l2": "5e83d12aed0efa58",
+#     "landsat_ot_c2_l2": "5e83d1507bc900d5",
+#     "sentinel_2a": "5e83a42c6eba8084",
+# }
 
 DATA_PRODUCTS_GG = {
     "landsat_8_c1": "LC08",
@@ -42,6 +42,10 @@ DATA_PRODUCTS_GG = {
     "landsat_etm_c1": "LE07",
 }
 
+PRODUCT_NAME = {
+    "collection 2": "Landsat Collection 2 Level-1 Product Bundle",
+    "landsatlook": "Full-Resolution Browse (Natural Color) GeoTIFF",
+}
 
 def _get_tokens(body):
     """Get `csrf_token` and `__ncforminfo`."""
@@ -121,13 +125,14 @@ class EarthExplorer(object):
             local_filename = os.path.join(output_dir, local_filename)
             print(os.path.basename(local_filename))
             if os.path.exists(local_filename):
-                if os.path.getsize(local_filename) == file_size:
-                    skip = True                
+                dst_size = os.path.getsize(local_filename)
+                if dst_size == file_size:
+                    skip = True       
             if skip:
                 print('File already exist.')
                 return local_filename
-            else:
-                with tqdm(
+            
+            with tqdm(
                 total=file_size, unit_scale=True, unit="B", unit_divisor=1024
             ) as pbar:
                     with open(local_filename, "wb") as f:
@@ -163,8 +168,7 @@ class EarthExplorer(object):
             Path to downloaded file.
         """
         
-        if not dataset:
-            dataset, path, row = util.guess_dataset(identifier)
+        dataset, path, row = util.guess_dataset(identifier)
         
         output_dir = os.path.join(output_dir, path+row)
         os.makedirs(output_dir, exist_ok=True)
@@ -175,17 +179,29 @@ class EarthExplorer(object):
             entity_id = identifier
             
         if not landsatlook:
-            data_product_id=DATA_PRODUCTS[dataset]
+            productName = PRODUCT_NAME["collection 2"]
         else:
-            r = self.api.request("dataset-download-options", params={"datasetName": dataset})
-            for data_product in r:
-                if data_product["productName"] == "LandsatLook Images with Geographic Reference":
-                    data_product_id = data_product["productId"]
-                    break
+            productName = PRODUCT_NAME["landsatlook"]
         
-        url = EE_DOWNLOAD_URL.format(data_product_id=data_product_id, entity_id=entity_id)
-        filename = self._download(url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
-        
+        r = self.api.request("dataset-download-options", params={"datasetName": dataset})
+        alternative_id = []
+        for data_product in r:
+            if data_product["productName"] == productName:
+                alternative_id.append(data_product["productId"])
+        if len(alternative_id) == 2:
+            try:
+                url = EE_DOWNLOAD_URL.format(data_product_id=alternative_id[0], entity_id=entity_id)
+                filename = self._download(url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
+            except:
+                url = EE_DOWNLOAD_URL.format(
+                    data_product_id=alternative_id[1], entity_id=entity_id)
+                filename = self._download(
+                    url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
+        else:
+            url = EE_DOWNLOAD_URL.format(
+                data_product_id=alternative_id[0], entity_id=entity_id)
+            filename = self._download(url, output_dir, timeout=timeout, chunk_size=1024, skip=skip)
+            
         return filename
 
 
@@ -241,9 +257,7 @@ class Google_download(object):
 
     def download(self, identifier, output_dir, dataset, bands, timeout=300, skip=False):
         
-        if not dataset:
-            dataset,path,row = util.guess_dataset(identifier)
-        
+        dataset, path, row = util.guess_dataset(identifier)
         output_dir = os.path.join(output_dir, path+row)
         os.makedirs(output_dir, exist_ok=True)
         

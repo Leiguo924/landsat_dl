@@ -88,15 +88,15 @@ def parse_scene_id(scene_id):
     }
 
 
-def landsat_dataset(satellite, collection="c1", level="l1"):
+def landsat_dataset(satellite, collection="c2", level="l1"):
     """Get landsat dataset name."""
-    if satellite == 5:
+    if satellite < 5:
+        sensor = "mss"
+    elif satellite == 5:
         sensor = "tm"
     elif satellite == 7:
         sensor = "etm"
-    elif satellite == 8 and collection == "c1":
-        sensor = "8"
-    elif satellite == 8 and collection == "c2":
+    elif satellite == 8 or satellite == 9:
         sensor = "ot"
     else:
         raise LandsatxploreError("Failed to guess dataset from identifier.")
