@@ -4,6 +4,18 @@ Landsat Collection 2 images download from USGS through the M2M web api
 
 This tool was modified based on the work of ***landsatxplore*** (https://github.com/yannforget/landsatxplore)
 
+The following datasets are supported (and theorically all datasets on EarthExplore):
+
+| Dataset Name | Dataset ID |
+|-|-|
+| Landsat 5 TM Collection 2 Level 1 | `landsat_tm_c2_l1` |
+| Landsat 5 TM Collection 2 Level 2 | `landsat_tm_c2_l2` |
+| Landsat 7 ETM+ Collection 2 Level 1 | `landsat_etm_c2_l1` |
+| Landsat 7 ETM+ Collection 2 Level 2 | `landsat_etm_c2_l2` |
+| Landsat 8/9 Collection 2 Level 1 | `landsat_ot_c2_l1` |
+| Landsat 8/9 Collection 2 Level 2 | `landsat_ot_c2_l2` |
+
+
 ## Why repeat the wheel?
 * *landsatxplore* has been outdated a while, there are a few critial issue：<br>
 <tab>1. only the entire archived file could be downloaded through the USGS api<br>
@@ -15,19 +27,9 @@ This tool was modified based on the work of ***landsatxplore*** (https://github.
 * no need to update the productID benifit from the new API
 * Allow individual band downloading for all landsat Collection 2 products
 * Potential to extend the library to all USGS products
+* we add a specifed option for *landsatlook* images download
 
 ***Yes, this should be much eaiser***
-
-The following datasets are supported (and theorically all datasets on EarthExplore):
-
-| Dataset Name | Dataset ID |
-|-|-|
-| Landsat 5 TM Collection 2 Level 1 | `landsat_tm_c2_l1` |
-| Landsat 5 TM Collection 2 Level 2 | `landsat_tm_c2_l2` |
-| Landsat 7 ETM+ Collection 2 Level 1 | `landsat_etm_c2_l1` |
-| Landsat 7 ETM+ Collection 2 Level 2 | `landsat_etm_c2_l2` |
-| Landsat 8/9 Collection 2 Level 1 | `landsat_ot_c2_l1` |
-| Landsat 8/9 Collection 2 Level 2 | `landsat_ot_c2_l2` |
 
 
 ## How to install?
@@ -95,7 +97,7 @@ Options:
   
   `landsat_dl search -d landsat_ot_c2_l1 -l 38.9 72.3 -s 2018-07-15 -e 2018-09-15 -o csv`
   
-  * Then, use the results list as identifiers to download data from Google, only band 'B8' is specified
+  * Then, use the results list as identifiers to download product, only the 'B8.TIF' band file will be downloaded.
   
   `landsat_dl download --list tmp.csv -b 8 -o ./test`
 
