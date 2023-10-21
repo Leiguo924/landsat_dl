@@ -1,6 +1,6 @@
 # landsat_dl
 
-Landsat images download from USGS or Google Cloud Storage.
+Landsat images download from USGS through the M2M web api
 
 This tool was modified based on the work of ***landsatxplore*** (https://github.com/yannforget/landsatxplore)
 
@@ -10,14 +10,13 @@ This tool was modified based on the work of ***landsatxplore*** (https://github.
 <tab>2. the api used in this package changed frequently<br>
 <tab>3. individual band downloading is not allowed<br>
 
-* All existed python modules that fetch Landsat images from Google are using the index file(index.tgr.gz) for searching.
-* However, it's incomplete with large gaps, and of course is out of date.
-
 ## What's different?
 * Seach image list through the USGS web API
-* Allow individual band downloading from Google<br>
+* no need to update the productID benifit from the new API
+* Allow individual band downloading for all landsat Collection 2 products
+* Potential to extend the library to all USGS products
 
-***Yes, I want them both.***
+***Yes, this should be much eaiser***
 
 ## How to install?
   - `cd /usr/local`  
@@ -28,7 +27,7 @@ This tool was modified based on the work of ***landsatxplore*** (https://github.
   - `pip install -e .`<br>
   
   finally, set the parameters of USGS account in the env_path file `~/.bashrc`
-  
+  **Note:** You need to apply for the M2M access prior to install this package!!!
   
   `export LANDSATXPLORE_USERNAME=Username`
   

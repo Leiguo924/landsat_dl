@@ -160,23 +160,25 @@ def scenes_from_csv(csv_file):
     help="Output directory",
 )
 @click.option(
-    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds"
-)
-@click.option("--skip", is_flag=True, default=False)
-@click.argument(
-    "scenes", type=click.STRING, nargs=-1, required=False
-)
-@click.option(
-    "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
-)
-@click.option(
     "--landsatlook", is_flag=True, help="Flag for downloading Landsatlook image"
 )
 @click.option(
     "--bands", "-b", type=click.STRING, required=False, default=["all"], multiple=True, help="Band"
 )
+@click.option(
+    "--timeout", "-t", type=click.INT, default=300, help="Download timeout in seconds"
+)
+@click.argument(
+    "scenes", type=click.STRING, nargs=-1, required=False
+)
+@click.option("--skip", is_flag=True, default=False)
 
-def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
+@click.option(
+    "--list", type=click.File('rb'), help="Identifier list(.csv) to download"
+)
+
+
+def download(username, password, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
     """Download one or several scenes."""
     ee = EarthExplorer(username, password)
     output_dir = os.path.abspath(output)
@@ -201,7 +203,7 @@ def dl_usgs(username, password, dataset, output, timeout, skip, scenes, list, la
 
 
 cli.add_command(search)
-cli.add_command(dl_usgs)
+cli.add_command(download)
 
 
 if __name__ == "__main__":
