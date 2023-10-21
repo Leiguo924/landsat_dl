@@ -6,6 +6,7 @@ landsat_dl/api.py
 landsat_dl/cli.py
 landsat_dl/earthexplorer.py
 landsat_dl/errors.py
+landsat_dl/tempCodeRunnerFile.py
 landsat_dl/util.py
 landsat_dl.egg-info/PKG-INFO
 landsat_dl.egg-info/SOURCES.txt

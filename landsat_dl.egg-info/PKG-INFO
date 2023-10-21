@@ -121,5 +121,3 @@ Options:
   * unify the module(function) name to *landsat_dl* (or other better name)
   * USGS download error handling, maybe wait for the update of *landsatxplore*?
   * parallel downloading with Aria2?
-
-

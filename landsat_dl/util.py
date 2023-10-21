@@ -177,6 +177,8 @@ def default_single_band(dataset):
         bands = ['B4.TIF']
     elif "landsat_8" in dataset :
         bands = ['B8.TIF']
+    elif "landsat_9" in dataset :
+        bands = ['B8.TIF']
     elif "landsat_etm" in dataset :
         bands = ['B8.TIF']
     else:
