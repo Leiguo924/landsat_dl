@@ -1,6 +1,6 @@
 # landsat_dl
 
-Landsat Collection 2 images download from USGS through the M2M web api
+Command-line tool for Landsat Collection 2 images downloading from USGS EarthExplore.
 
 This tool was modified based on the work of ***landsatxplore*** (https://github.com/yannforget/landsatxplore)
 
@@ -41,6 +41,7 @@ The following datasets are supported (and theorically all datasets on EarthExplo
   - `pip install -e .`<br>
   
   finally, set the parameters of USGS account in the env_path file `~/.bashrc`
+  
   **Note:** You need to apply for the M2M access prior to install this package!!!
   
   `export LANDSATXPLORE_USERNAME=Username`
