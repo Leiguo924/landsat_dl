@@ -1,6 +1,6 @@
 # landsat_dl
 
-Landsat images download from USGS through the M2M web api
+Landsat Collection 2 images download from USGS through the M2M web api
 
 This tool was modified based on the work of ***landsatxplore*** (https://github.com/yannforget/landsatxplore)
 
@@ -17,6 +17,18 @@ This tool was modified based on the work of ***landsatxplore*** (https://github.
 * Potential to extend the library to all USGS products
 
 ***Yes, this should be much eaiser***
+
+The following datasets are supported (and theorically all datasets on EarthExplore):
+
+| Dataset Name | Dataset ID |
+|-|-|
+| Landsat 5 TM Collection 2 Level 1 | `landsat_tm_c2_l1` |
+| Landsat 5 TM Collection 2 Level 2 | `landsat_tm_c2_l2` |
+| Landsat 7 ETM+ Collection 2 Level 1 | `landsat_etm_c2_l1` |
+| Landsat 7 ETM+ Collection 2 Level 2 | `landsat_etm_c2_l2` |
+| Landsat 8/9 Collection 2 Level 1 | `landsat_ot_c2_l1` |
+| Landsat 8/9 Collection 2 Level 2 | `landsat_ot_c2_l2` |
+
 
 ## How to install?
   - `cd /usr/local`  
@@ -37,9 +49,8 @@ This tool was modified based on the work of ***landsatxplore*** (https://github.
   ```
   landsat_dl [OPTIONS] COMMAND [ARGS]...
   Commands:
-    dl-google  Download one or several scenes.
-    dl-usgs    Download one or several scenes.
-    search     Search for scenes.
+    download    Download one or several scenes.
+    search      Search for scenes.
   ```
   
   * Search
@@ -63,42 +74,31 @@ Options:
   ```
   * Download from USGS
   ```
-  Usage: landsat_dl dl-usgs [OPTIONS] [SCENES]...
+  Usage: landsat_dl download [OPTIONS] [SCENES]...
 
 Options:
-  -u, --username TEXT    EarthExplorer username.
-  -p, --password TEXT    EarthExplorer password.
+  -u, --username TEXT    EarthExplorer username
+  -p, --password TEXT    EarthExplorer password
   -d, --dataset TEXT     Dataset
-  -o, --output PATH      Output directory.
-  -t, --timeout INTEGER  Download timeout in seconds.
-  --skip
-  --list FILENAME        Identifier list to download
-  --help                 Show this message and exit.
-  ```
-  * Download from Google Storage
-  ```
-  Usage: landsat_dl dl-google [OPTIONS] [SCENES]...
-
-Options:
-  -d, --dataset TEXT     Dataset
-  -b, --bands TEXT       Band
   -o, --output PATH      Output directory
+  --landsatlook          Flag for downloading Landsatlook image
+  -b, --bands TEXT       Band
   -t, --timeout INTEGER  Download timeout in seconds
   --skip
-  --list FILENAME        Identifier list (.csv) to download
-  --help                 Show this message and exit
+  --list FILENAME        Identifier list(.csv) to download
+  --help                 Show this message and exit.
   ```
+  
   
  ## Example
   * First, save the search result to a csv file (default: tmp.csv)
   
-  `landsat_dl search -d landsat_8_c1 -l 38.9 72.3 -s 2018-07-15 -e 2018-09-15 -o csv`
+  `landsat_dl search -d landsat_ot_c2_l1 -l 38.9 72.3 -s 2018-07-15 -e 2018-09-15 -o csv`
   
   * Then, use the results list as identifiers to download data from Google, only band 'B8' is specified
   
-  `landsat_dl dl-google --list tmp.csv -b 8 -o ./test`
+  `landsat_dl download --list tmp.csv -b 8 -o ./test`
 
   ## To do
-  * unify the module(function) name to *landsat_dl* (or other better name)
-  * USGS download error handling, maybe wait for the update of *landsatxplore*?
+  * USGS download error handling?
   * parallel downloading with Aria2?
