@@ -30,6 +30,10 @@ EE_LOGOUT_URL = "https://earthexplorer.usgs.gov/logout"
 #     "sentinel_2a": "5e83a42c6eba8084",
 # }
 
+PRODUCT_NAME = {
+    "landsatlook": "Full-Resolution Browse (Natural Color) GeoTIFF",
+    "collection 2": "Landsat Collection 2 Level-1 Product Bundle"
+}
 
 
 def _get_tokens(body):
