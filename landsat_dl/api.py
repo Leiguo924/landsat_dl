@@ -20,19 +20,19 @@ API_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 class API(object):
     """EarthExplorer API."""
 
-    def __init__(self, username, password):
+    def __init__(self, username, token):
         """EarthExplorer API.
 
         Parameters
         ----------
         username : str
             USGS EarthExplorer username.
-        password : str
-            USGS EarthExplorer password.
+        token : str
+            USGS EarthExplorer token.
         """
         self.url = API_URL
         self.session = requests.Session()
-        self.login(username, password)
+        self.login(username, token)
 
     @staticmethod
     def raise_api_error(response):
@@ -87,18 +87,18 @@ class API(object):
             self.raise_api_error(r)
         return r.json().get("data")
 
-    def login(self, username, password):
+    def login(self, username, token):
         """Get an API key.
 
         Parameters
         ----------
         username : str
             EarthExplorer username.
-        password : str
-            EarthExplorer password.
+        token : str
+            EarthExplorer token.
         """
-        login_url = urljoin(self.url, "login")
-        payload = {"username": username, "password": password}
+        login_url = urljoin(self.url, "login-token")
+        payload = {"username": username, "token": token}
         r = self.session.post(login_url, json.dumps(payload))
         self.raise_api_error(r)
         self.session.headers["X-Auth-Token"] = r.json().get("data")

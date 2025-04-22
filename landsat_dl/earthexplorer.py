@@ -51,25 +51,25 @@ def _get_tokens(body):
 class EarthExplorer(object):
     """Access Earth Explorer portal."""
 
-    def __init__(self, username, password):
+    def __init__(self, username, token):
         """Access Earth Explorer portal."""
         self.session = requests.Session()
-        self.login(username, password)
-        self.api = API(username, password)
+        self.login(username, token)
+        self.api = API(username, token)
 
     def logged_in(self):
         """Check if the log-in has been successfull based on session cookies."""
         eros_sso = self.session.cookies.get("EROS_SSO_production_secure")
         return bool(eros_sso)
 
-    def login(self, username, password):
+    def login(self, username, token):
         """Login to Earth Explorer."""
         rsp = self.session.get(EE_LOGIN_URL)
         # csrf, ncform = _get_tokens(rsp.text)
         csrf = _get_tokens(rsp.text)
         payload = {
             "username": username,
-            "password": password,
+            "token": token,
             "csrf": csrf,
             # "__ncforminfo": ncform,
         }
@@ -136,7 +136,7 @@ class EarthExplorer(object):
             )
         return local_filename
 
-    def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False, landsatlook=False, bands=None,username=None,password=None):
+    def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False, landsatlook=False, bands=None,username=None,token=None):
         """Download a Landsat scene.
 
         Parameters

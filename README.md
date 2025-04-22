@@ -34,19 +34,24 @@ The following datasets are supported (and theorically all datasets on EarthExplo
 
 ## How to install?
   - `cd /usr/local`  
-  - `git clone https://github.com/TristanBlus/landsat_dl.git`  
+  - `git clone https://github.com/Leiguo924/landsat_dl.git`  
   - `cd landsat_dl`<br>
   
   install this package in the editable mode with option `-e`  
   - `pip install -e .`<br>
   
   finally, set the parameters of USGS account in the env_path file `~/.bashrc`
+    
+  `export M2M_USERNAME=Username`
   
-  **Note:** You need to apply for the M2M access prior to install this package!!!
-  
-  `export LANDSATXPLORE_USERNAME=Username`
-  
-  `export LANDSATXPLORE_PASSWORD=Password`
+  `export M2M_TOKEN=Token`
+
+  **Note:** 
+  You need to apply for the M2M access (username + application token) prior to install this package!!!
+  - go to [ers.cr.usgs.gov](https://ers.cr.usgs.gov/)
+  - write a proposal (***accecss request***) to get the access
+  - create an application token and record it
+
   
  ## Usage
   ```

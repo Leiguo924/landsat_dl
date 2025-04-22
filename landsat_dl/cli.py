@@ -32,14 +32,14 @@ def cli():
     "--username",
     type=click.STRING,
     help="EarthExplorer username.",
-    envvar="LANDSATXPLORE_USERNAME",
+    envvar="M2M_USERNAME",
 )
 @click.option(
     "-p",
-    "--password",
+    "--token",
     type=click.STRING,
-    help="EarthExplorer password.",
-    envvar="LANDSATXPLORE_PASSWORD",
+    help="EarthExplorer login token.",
+    envvar="M2M_TOKEN",
 )
 @click.option(
     "-d",
@@ -74,10 +74,10 @@ def cli():
 )
 @click.option("-m", "--limit", type=click.INT, help="Max. results returned.")
 def search(
-    username, password, dataset, location, bbox, clouds, start, end, output, limit
+    username, token, dataset, location, bbox, clouds, start, end, output, limit
 ):
     """Search for scenes."""
-    api = API(username, password)
+    api = API(username, token)
 
     where = {"dataset": dataset}
     if location:
@@ -138,18 +138,18 @@ def scenes_from_csv(csv_file):
 
 @click.command()
 @click.option(
-    "--username",
     "-u",
+    "--username",
     type=click.STRING,
-    help="EarthExplorer username",
-    envvar="LANDSATXPLORE_USERNAME",
+    help="EarthExplorer username.",
+    envvar="M2M_USERNAME",
 )
 @click.option(
-    "--password",
     "-p",
+    "--token",
     type=click.STRING,
-    help="EarthExplorer password",
-    envvar="LANDSATXPLORE_PASSWORD",
+    help="EarthExplorer login token.",
+    envvar="M2M_TOKEN",
 )
 @click.option("--dataset", "-d", type=click.STRING, required=False, help="Dataset")
 @click.option(
@@ -178,9 +178,9 @@ def scenes_from_csv(csv_file):
 )
 
 
-def download(username, password, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
+def download(username, token, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
     """Download one or several scenes."""
-    ee = EarthExplorer(username, password)
+    ee = EarthExplorer(username, token)
     output_dir = os.path.abspath(output)
     
     if dataset and dataset not in DATASETS:
@@ -193,10 +193,10 @@ def download(username, password, dataset, output, timeout, skip, scenes, list, l
 
     for scene in scenes:
         if not ee.logged_in():
-            ee = EarthExplorer(username, password)
+            ee = EarthExplorer(username, token)
         fname = ee.download(
             scene, output_dir, dataset=dataset, timeout=timeout, skip=skip, landsatlook=landsatlook, bands=bands
-        ,username=username, password=password)
+        ,username=username, token=token)
         if skip:
             click.echo(fname)
     ee.logout()
