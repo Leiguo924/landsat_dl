@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": false,
-            "args": ["search", "-d", "landsat_ot_c2_l2", "-l", "36.8", "99.8"]
+            "args": ["download", "-d", "landsat_ot_c2_l2", "--list", "landsat_ot_c2_l2_N36.8_E99.8.csv", "-b", "4"],
         }
     ]
 }

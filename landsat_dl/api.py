@@ -20,7 +20,7 @@ API_URL = "https://m2m.cr.usgs.gov/api/api/json/stable/"
 class API(object):
     """EarthExplorer API."""
 
-    def __init__(self, username, token):
+    def __init__(self, username, password=None, token=None):
         """EarthExplorer API.
 
         Parameters
@@ -32,6 +32,14 @@ class API(object):
         """
         self.url = API_URL
         self.session = requests.Session()
+        if token is None:
+            raise ValueError(
+                "USGS API token is required. Please use the `token` parameter."
+            )
+        if password is None:
+            raise ValueError(
+                "USGS password is required for downloading. Please use the `password` parameter."
+            )
         self.login(username, token)
 
     @staticmethod

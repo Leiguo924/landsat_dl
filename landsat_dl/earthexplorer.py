@@ -32,7 +32,8 @@ EE_LOGOUT_URL = "https://earthexplorer.usgs.gov/logout"
 
 PRODUCT_NAME = {
     "landsatlook": "Full-Resolution Browse (Natural Color) GeoTIFF",
-    "collection 2": "Landsat Collection 2 Level-1 Product Bundle"
+    "collection 2 level 1": "Landsat Collection 2 Level-1 Product Bundle",
+    "collection 2 level 2": "Landsat Collection 2 Level-2 Product Bundle",
 }
 
 
@@ -51,25 +52,29 @@ def _get_tokens(body):
 class EarthExplorer(object):
     """Access Earth Explorer portal."""
 
-    def __init__(self, username, token):
+    def __init__(self, username, password=None, token=None):
         """Access Earth Explorer portal."""
         self.session = requests.Session()
-        self.login(username, token)
-        self.api = API(username, token)
+        if password is None and token is None:
+            raise ValueError(
+                "Either password or token must be provided for Earth Explorer downloading."
+            )
+        self.login(username, password)
+        self.api = API(username, password=password, token=token)
 
     def logged_in(self):
         """Check if the log-in has been successfull based on session cookies."""
         eros_sso = self.session.cookies.get("EROS_SSO_production_secure")
         return bool(eros_sso)
 
-    def login(self, username, token):
+    def login(self, username, password):
         """Login to Earth Explorer."""
         rsp = self.session.get(EE_LOGIN_URL)
         # csrf, ncform = _get_tokens(rsp.text)
         csrf = _get_tokens(rsp.text)
         payload = {
             "username": username,
-            "token": token,
+            "password": password,
             "csrf": csrf,
             # "__ncforminfo": ncform,
         }
@@ -136,7 +141,7 @@ class EarthExplorer(object):
             )
         return local_filename
 
-    def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False, landsatlook=False, bands=None,username=None,token=None):
+    def download(self, identifier, output_dir, dataset=None, timeout=300, skip=False, landsatlook=False, bands=None,username=None,password=None):
         """Download a Landsat scene.
 
         Parameters
@@ -169,9 +174,16 @@ class EarthExplorer(object):
             entity_id = identifier
             
         if landsatlook:
+            if dataset.endswith("c2_l2"):
+                raise ValueError(
+                    "Landsatlook is not available for Collection 2 Level-2 products."
+                )
             productName = PRODUCT_NAME["landsatlook"]
         else:
-            productName = PRODUCT_NAME["collection 2"]
+            if dataset.endswith("c2_l2"):
+                productName = PRODUCT_NAME["collection 2 level 2"]
+            else:
+                productName = PRODUCT_NAME["collection 2 level 1"]
         
         r = self.api.request("download-options", params={"datasetName": dataset, "entityIds": entity_id})
         product_id = []
@@ -191,7 +203,8 @@ class EarthExplorer(object):
                         bands = util.band_check(dataset, bands)
                     for band in bands:
                         for subproduct in data_product["secondaryDownloads"]:
-                            if identifier + '_' + band == subproduct["displayId"]:
+                            # if identifier + '_' + band == subproduct["displayId"]:
+                            if subproduct["displayId"].endswith(band):
                                 if subproduct["available"]:
                                     product_id.append(subproduct["id"])
                                     product_entityid.append(subproduct["entityId"])

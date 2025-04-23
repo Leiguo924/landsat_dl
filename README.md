@@ -43,6 +43,8 @@ The following datasets are supported (and theorically all datasets on EarthExplo
   finally, set the parameters of USGS account in the env_path file `~/.bashrc`
     
   `export M2M_USERNAME=Username`
+
+  `export M2M_PASSWORD=PASSWORD`
   
   `export M2M_TOKEN=Token`
 
@@ -68,6 +70,7 @@ The following datasets are supported (and theorically all datasets on EarthExplo
 Options:
   -u, --username TEXT             EarthExplorer username.
   -p, --password TEXT             EarthExplorer password.
+  -t, --token TEXT                EarthExplorer token.
   -d, --dataset [landsat_tm_c1|landsat_etm_c1|landsat_8_c1|landsat_tm_c2_l1|landsat_tm_c2_l2|landsat_etm_c2_l1|landsat_etm_c2_l2|landsat_ot_c2_l1|landsat_ot_c2_l2|sentinel_2a]
                                   Dataset.
   -l, --location FLOAT...         Point of interest (latitude, longitude).
@@ -85,16 +88,17 @@ Options:
   Usage: landsat_dl download [OPTIONS] [SCENES]...
 
 Options:
-  -u, --username TEXT    EarthExplorer username
-  -p, --password TEXT    EarthExplorer password
-  -d, --dataset TEXT     Dataset
-  -o, --output PATH      Output directory
-  --landsatlook          Flag for downloading Landsatlook image
-  -b, --bands TEXT       Band
-  -t, --timeout INTEGER  Download timeout in seconds
+  -u, --username TEXT             EarthExplorer username.
+  -p, --password TEXT             EarthExplorer password.
+  -t, --token TEXT                EarthExplorer token.
+  -d, --dataset TEXT              Dataset
+  -o, --output PATH               Output directory
+  --landsatlook                   Flag for downloading Landsatlook image
+  -b, --bands TEXT                Band
+  -t, --timeout INTEGER           Download timeout in seconds
   --skip
-  --list FILENAME        Identifier list(.csv) to download
-  --help                 Show this message and exit.
+  --list FILENAME                 Identifier list(.csv) to download
+  --help                           Show this message and exit.
   ```
   
   

@@ -36,6 +36,13 @@ def cli():
 )
 @click.option(
     "-p",
+    "--password",
+    type=click.STRING,
+    help="EarthExplorer login password.",
+    envvar="M2M_PASSWORD",
+)
+@click.option(
+    "-t",
     "--token",
     type=click.STRING,
     help="EarthExplorer login token.",
@@ -74,10 +81,10 @@ def cli():
 )
 @click.option("-m", "--limit", type=click.INT, help="Max. results returned.")
 def search(
-    username, token, dataset, location, bbox, clouds, start, end, output, limit
+    username, password, token, dataset, location, bbox, clouds, start, end, output, limit
 ):
     """Search for scenes."""
-    api = API(username, token)
+    api = API(username, password=password, token=token)
 
     where = {"dataset": dataset}
     if location:
@@ -146,6 +153,13 @@ def scenes_from_csv(csv_file):
 )
 @click.option(
     "-p",
+    "--password",
+    type=click.STRING,
+    help="EarthExplorer login password.",
+    envvar="M2M_PASSWORD",
+)
+@click.option(
+    "-t",
     "--token",
     type=click.STRING,
     help="EarthExplorer login token.",
@@ -178,9 +192,9 @@ def scenes_from_csv(csv_file):
 )
 
 
-def download(username, token, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
+def download(username, password, token, dataset, output, timeout, skip, scenes, list, landsatlook, bands):
     """Download one or several scenes."""
-    ee = EarthExplorer(username, token)
+    ee = EarthExplorer(username, password=password, token=token)
     output_dir = os.path.abspath(output)
     
     if dataset and dataset not in DATASETS:
@@ -193,10 +207,10 @@ def download(username, token, dataset, output, timeout, skip, scenes, list, land
 
     for scene in scenes:
         if not ee.logged_in():
-            ee = EarthExplorer(username, token)
+            ee = EarthExplorer(username, password)
         fname = ee.download(
             scene, output_dir, dataset=dataset, timeout=timeout, skip=skip, landsatlook=landsatlook, bands=bands
-        ,username=username, token=token)
+        ,username=username, password=password)
         if skip:
             click.echo(fname)
     ee.logout()
